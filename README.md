@@ -1,0 +1,8 @@
+## Gait Assesor
+
+This is a machine learning model that makes an assessment of a person's gait with an input of a video   file(.mp4)
+
+The ml model is a hybrid model using a Convolutional Neural Network and Recurrent Neural Network
+in tandom to execute an assessment of the Gait state of any person. Returning a boolean.
+
+##### This is a work in progress and licensed under Apache 2.0

@@ -1,0 +1,6 @@
+mediapipe
+csv
+tensorflow
+numpy
+matplotlib
+
