@@ -5,14 +5,16 @@ channels:
 dependencies:
   - pandas
   - scikit-learn
-  - pip
   - tensorflow
-  - python = 3.11
-  - mediapipe
+  - python = 3.10
   - matplotlib
   - numpy
-  - csv
+  - tqdm
+  - opencv
+  - pip
   - pip:
-    - tensorflow == 2.12.*
-    - mediapipe == 0.10.*
+    - pip>=23.2
+    - "mediapipe==0.10.*"
+    - tensorflow==2.12.*
+    - tensorflow-addons==0.22
 
