@@ -1,13 +1,15 @@
 ## Gait Assesor
 
 This is a machine learning model that makes an assessment of a person's gait with an input of a video   file(.mp4)
+### Dependencies
 
-### Setup
+Anaconda installed on your operating system.
 
-Anaconda installed on your system
-conda env create -f environment.yml
-conda activate gaitenv
-
+#### Setup
+```
+conda env create -f environment.yml<br>
+conda activate gaitenv<br>
+```
 The ml model is a hybrid model using a Convolutional Neural Network and Recurrent Neural Network
 in tandom to execute an assessment of the Gait state of any person. Returning a boolean.
 
