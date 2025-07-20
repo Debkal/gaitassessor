@@ -7,8 +7,8 @@ Anaconda installed on your operating system.
 
 #### Setup
 ```
-conda env create -f environment.yml<br>
-conda activate gaitenv<br>
+conda env create -f environment.yml
+conda activate gaitenv
 ```
 The ml model is a hybrid model using a Convolutional Neural Network and Recurrent Neural Network
 in tandom to execute an assessment of the Gait state of any person. Returning a boolean.
