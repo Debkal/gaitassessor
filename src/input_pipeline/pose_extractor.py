@@ -64,7 +64,7 @@ class Pose_extractor:
                 base = os.path.splitext(os.path.basename(video))[0]
                 out_npz = f"{base}_clip__{start}.npz"
 
-                np.savez_compressed(os.path.join(posenpy, out_npz), arr=seq)
+                np.savez_compressed(os.path.join(posenpy, out_npz), arr=seq, hips=hips)
 
                 label = base.split("_")[0]
                 rows.append(
@@ -81,6 +81,8 @@ def main():
     rows = []
     for vid in tqdm(glob.glob(os.path.join(video, "*.mp4")), desc="Gait videos"):
         rows.extend(Pose_extractor.process_video(vid))
+        clip_counter + 1
+        print(clip_counter)
 
     df = pd.DataFrame(rows)
     train_df, val_df = train_test_split(
