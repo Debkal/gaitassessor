@@ -1,9 +1,16 @@
 ## Gait Assesor
 
-This is a machine learning model that makes an assessment of a person's gait with an input of a video   file(.mp4)
+This is a machine learning model that makes an assessment of a person's gait with an input of a video   file(.mp4)<br>
+
 ### Dependencies
 
 Anaconda installed on your operating system.
+
+<ul>
+    <li>Mediapipe</li>
+    <li>TensorFlow</li>
+    <li>Numpy</li>
+</ul>
 
 #### Setup
 ```
