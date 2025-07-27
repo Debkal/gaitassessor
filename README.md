@@ -17,7 +17,21 @@ Anaconda installed on your operating system.
 conda env create -f environment.yml
 conda activate gaitenv
 ```
-The ml model is a hybrid model using a Convolutional Neural Network and Recurrent Neural Network
-in tandom to execute an assessment of the Gait state of any person. Returning a boolean.
+#### Running the project
+Make sure your file tree structure is arranged in the following format
+
+gaitassessor/
+    | data
+        |
+
+    | src
+    environment.yml
+
+'''
+cd
+'''
+
+This machine learning model is a hybrid model using a Convolutional Neural Network and Recurrent Neural Network
+in tandom to execute an assessment of the gait state of any person. It will return a boolean for its overall assessment. True for a gait within normal deviation and False for a gait with irregular deviation. For both cases it will digress into key frames that lead to its assessment. It will respond with a description of the key frame and what could possibly indicate a break down in gait at these key frames.
 
 ##### This is a work in progress and licensed under Apache 2.0

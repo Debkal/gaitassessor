@@ -13,16 +13,13 @@ from enumvars import Directory as dir
 video = dir.VIDEO.value
 posenpy = dir.POSEDATANPY.value
 posecsv = dir.POSEDATACSV.value
-clip_frame_len = 64
+
+clip_frame_len = 64  # chunking clip frames
 
 
 class Pose_extractor:
     def __init__(self, scheme):
         self.scheme = scheme
-
-    def getPose(video_path, video_length=64):
-        posedata = "example.csv"
-        return posedata
 
     def process_video(video: str):
         mp_pose = mp.solutions.pose.Pose(
@@ -37,10 +34,10 @@ class Pose_extractor:
 
         rows = []
 
-        for start in range(0, total - clip_frame_len + 1, clip_frame_len):
+        for start in range(0, total - 1, total):
             seq = []
             cap.set(cv2.CAP_PROP_POS_FRAMES, start)
-            for _ in range(clip_frame_len):
+            for _ in range(total):
                 ok, frame = cap.read()
                 if not ok:
                     break
@@ -55,7 +52,7 @@ class Pose_extractor:
                     pts = np.zeros((33, 3), np.float32)
                 seq.append(pts)
 
-            if len(seq) == clip_frame_len:
+            if len(seq) == total:
                 seq = np.stack(seq)
 
                 hips = (seq[:, 23] + seq[:, 24]) / 2.0
@@ -81,7 +78,7 @@ def main():
     rows = []
     for vid in tqdm(glob.glob(os.path.join(video, "*.mp4")), desc="Gait videos"):
         rows.extend(Pose_extractor.process_video(vid))
-        clip_counter + 1
+        clip_counter += 1
         print(clip_counter)
 
     df = pd.DataFrame(rows)
