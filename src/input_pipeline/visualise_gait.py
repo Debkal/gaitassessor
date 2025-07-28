@@ -4,13 +4,15 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from enumvars import Directory
+from collections import defaultdict
+import re
 
 
 # Mediapipe's connections for drawing the skeleton
 POSE_CONNECTIONS = mp.solutions.pose.POSE_CONNECTIONS
 
 
-def visualise_gait(npz_path: str):
+def visualise_gait(npz_path: str, video_writer: cv2.VideoWriter):
     """
     Loads a processed pose clip and overlays it on the original video for verification.
 
@@ -56,6 +58,7 @@ def visualise_gait(npz_path: str):
     for frame_idx in range(len(pose_seq)):
         ok, frame = cap.read()
         if not ok:
+            print("out of frames")
             break
 
         # Get the landmarks for the current frame
@@ -77,63 +80,85 @@ def visualise_gait(npz_path: str):
         for point in points:
             cv2.circle(frame, point, 3, (0, 0, 255), -1)
 
-        cv2.imshow(f"Gait Visualization: {os.path.basename(video_path)}", frame)
-
+        video_writer.write(frame)
         # Allow breaking the loop by pressing 'q'
         if cv2.waitKey(30) & 0xFF == ord("q"):
             break
 
     cap.release()
-    cv2.destroyAllWindows()
 
 
 def main():
     """
-    Presents an interactive menu to let the user select a specific clip
-    to visualise, or to visualise all clips sequentially.
+    Finds all processed .npz files, groups them by their base video name,
+    and creates a stitched MP4 of the base video
     """
-    # Use sorted() for a consistent order in the menu
     npz_files = sorted(glob.glob(os.path.join(Directory.POSEDATANPY.value, "*.npz")))
     if not npz_files:
-        print(f"No processed .npz files found in {Directory.POSEDATANPY.value}")
+        print(f"No processed .npz files found in '{Directory.POSEDATANPY.value}'")
         print("Please run `extract_poses.py` first.")
         return
 
-    while True:
-        print("\nAvailable clips for visualization:")
-        for i, f_path in enumerate(npz_files):
-            print(f"  [{i + 1}] {os.path.basename(f_path)}")
+    # Group .npz files by their video base name
+    grouped_files = defaultdict(list)
+    for npz_path in npz_files:
+        filename = os.path.splitext(os.path.basename(npz_path))[0]
+        base_name = "_".join(filename.split("_")[:-3])
+        if base_name:
+            grouped_files[base_name].append(npz_path)
 
-        print(
-            "\nEnter a number to select a clip, 'all' to process every clip, or 'q' to quit."
+    for base_name, clip_paths in grouped_files.items():
+        clip_paths.sort(
+            key=lambda p: int(
+                re.search(r"__(\d+)(?:\.npz)?$", os.path.basename(p)).group(1)
+            )
         )
 
-        choice = input("> ").strip().lower()
+    if not grouped_files:
+        print(
+            "Could not find any .npz files with a valid naming convention (e.g., 'basename_tag_tag_frame')."
+        )
+        return
 
-        if choice == "q":
-            break
-        elif choice == "all":
-            print(
-                "\nVisualizing all clips. Press 'q' in the video window to skip to the next one."
-            )
-            for npz_path in npz_files:
-                print(f"Now showing: {os.path.basename(npz_path)}")
-                visualise_gait(npz_path)
-            print("\nFinished visualizing all clips.")
-        else:
-            try:
-                index = int(choice) - 1
-                if 0 <= index < len(npz_files):
-                    selected_path = npz_files[index]
-                    print(f"\nVisualizing clip: {os.path.basename(selected_path)}")
-                    print("Press 'q' in the video window to return to the menu.")
-                    visualise_gait(selected_path)
-                else:
-                    print(
-                        f"Invalid number. Please enter a number between 1 and {len(npz_files)}."
-                    )
-            except ValueError:
-                print("Invalid input. Please enter a number, 'all', or 'q'.")
+    print(f"Found {len(npz_files)} clips from {len(grouped_files)} source videos.\n")
+
+    # Process each group of files into its own video, enumerating by base name
+    for i, (base_name, clip_paths) in enumerate(grouped_files.items(), 1):
+        print(
+            f"[{i}/{len(grouped_files)}] Processing {len(clip_paths)} clips for base video: '{base_name}'"
+        )
+
+        output_filename = f"{base_name}_gait_visualization.mp4"
+        source_video_path = os.path.join(Directory.VIDEO.value, f"{base_name}.mp4")
+
+        if not os.path.exists(source_video_path):
+            print(f" Error: Source video not found at '{source_video_path}'. Skipping.")
+            continue
+
+        # Determine video properties from the source video
+        cap = cv2.VideoCapture(source_video_path)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        print(fps)
+        cap.release()
+
+        # Initialize VideoWriter for this group
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        video_writer = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))
+        if not video_writer.isOpened():
+            print(f" Error: Could not create output file '{output_filename}'.")
+            continue
+
+        # Process each clip and append to the group's video
+        for npz_path in clip_paths:
+            visualise_gait(npz_path, video_writer)
+
+        # Finalize the video for this group
+        video_writer.release()
+        print(f" Saved: '{output_filename}'")
+
+    print("\nAll processing complete.")
 
 
 if __name__ == "__main__":

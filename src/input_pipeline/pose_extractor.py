@@ -31,13 +31,14 @@ class Pose_extractor:
 
         cap = cv2.VideoCapture(video)
         total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        remainder = total % clip_frame_len
 
         rows = []
 
-        for start in range(0, total - 1, total):
+        for start in range(0, total - 1, clip_frame_len):
             seq = []
             cap.set(cv2.CAP_PROP_POS_FRAMES, start)
-            for _ in range(total):
+            for _ in range(clip_frame_len):
                 ok, frame = cap.read()
                 if not ok:
                     break
@@ -52,7 +53,7 @@ class Pose_extractor:
                     pts = np.zeros((33, 3), np.float32)
                 seq.append(pts)
 
-            if len(seq) == total:
+            if len(seq) == clip_frame_len:
                 seq = np.stack(seq)
 
                 hips = (seq[:, 23] + seq[:, 24]) / 2.0
