@@ -15,13 +15,13 @@ POSE_CONNECTIONS = mp.solutions.pose.POSE_CONNECTIONS
 def visualise_gait(npz_path: str, video_writer: cv2.VideoWriter):
     """
     Loads a processed pose clip and overlays it on the original video for verification.
-
+    Outputs a stitched video consisting of the processed clips
     Args:
         npz_path (str): Path to the .npz file containing the processed pose data.
+        video_writer (cv2Object): cv2 constructor for Video Stitching
     """
     # 1. Parse the .npz path to find the original video and start frame
     filename = os.path.splitext(os.path.basename(npz_path))[0]
-    print(filename)
     parts = filename.split("_")
     print(filename)
 
@@ -140,7 +140,6 @@ def main():
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = cap.get(cv2.CAP_PROP_FPS)
-        print(fps)
         cap.release()
 
         # Initialize VideoWriter for this group
