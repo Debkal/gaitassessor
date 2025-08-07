@@ -129,6 +129,7 @@ def main():
         )
 
         output_filename = f"{base_name}_gait_visualization.mp4"
+        output_path = os.path.join(Directory.VIDEOOUTPUT.value, output_filename)
         source_video_path = os.path.join(Directory.VIDEO.value, f"{base_name}.mp4")
 
         if not os.path.exists(source_video_path):
@@ -144,7 +145,12 @@ def main():
 
         # Initialize VideoWriter for this group
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        video_writer = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))
+        video_writer = cv2.VideoWriter(
+            output_path,
+            fourcc,
+            fps,
+            (width, height),
+        )
         if not video_writer.isOpened():
             print(f" Error: Could not create output file '{output_filename}'.")
             continue
@@ -155,7 +161,7 @@ def main():
 
         # Finalize the video for this group
         video_writer.release()
-        print(f" Saved: '{output_filename}'")
+        print(f" Saved: '{output_path}'")
 
     print("\nAll processing complete.")
 
