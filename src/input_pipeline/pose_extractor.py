@@ -1,18 +1,17 @@
 import numpy as np
 import cv2
-import os, glob
-from pathlib import Path
+import os
+import glob
 from tqdm import tqdm
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import mediapipe as mp
-import os
 import csv
-from enumvars import Directory as dir
+import enumvars as ev
 
-video = dir.VIDEO.value
-posenpy = dir.POSEDATANPY.value
-posecsv = dir.POSEDATACSV.value
+video = ev.Directory.VIDEO.value
+posenpy = ev.Directory.POSEDATANPY.value
+posecsv = ev.Directory.POSEDATACSV.value
 
 clip_frame_len = 64  # chunking clip frames
 
@@ -23,10 +22,11 @@ class Pose_extractor:
 
     def process_video(video: str):
         mp_pose = mp.solutions.pose.Pose(
-            static_image_mode=False,
-            model_complexity=1,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5,
+            static_image_mode=ev.Pose_config.STATIC_IMAGE_MODE.value,
+            model_complexity=ev.Pose_config.MODEL_COMPLEXITY.value,
+            min_detection_confidence=ev.Pose_config.MIN_DETETECTION_CONFIDENCE.value,
+            min_tracking_confidence=ev.Pose_config.MIN_TRACKING_CONFIDENCE.value,
+            enable_segmentation=ev.Pose_config.SEGMENT_MASK.value,
         )
 
         cap = cv2.VideoCapture(video)
