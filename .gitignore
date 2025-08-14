@@ -2,3 +2,5 @@ src/input_pipeline/__pycache__/
 /__pycache__/
 *.pyc
 data
+*.task
+*.tflite

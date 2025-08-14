@@ -6,33 +6,37 @@ from tqdm import tqdm
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+from mediapipe.tasks.python import BaseOptions
+from mediapipe.tasks.python.vision import PoseLandmarkerOptions,PoseLandmarker
 import csv
 import enumvars as ev
 
 video = ev.Directory.VIDEO.value
-posenpy = ev.Directory.POSEDATANPY.value
-posecsv = ev.Directory.POSEDATACSV.value
+posenpy = ev.Directory.POSE_DATA_NPY.value
+posecsv = ev.Directory.POSE_DATA_CSV.value
 
 clip_frame_len = 64  # chunking clip frames
-
 
 class Pose_extractor:
     def __init__(self, scheme):
         self.scheme = scheme
 
-    def process_video(video: str):
-        mp_pose = mp.solutions.pose.Pose(
-            static_image_mode=ev.Pose_config.STATIC_IMAGE_MODE.value,
-            model_complexity=ev.Pose_config.MODEL_COMPLEXITY.value,
-            min_detection_confidence=ev.Pose_config.MIN_DETETECTION_CONFIDENCE.value,
+    def process_video(video_path: str):
+        base_options = BaseOptions(model_asset_path=ev.Directory.POSE_HEAVY_MODEL.value)
+        options = PoseLandmarkerOptions(
+            base_options=base_options,
+            running_mode=ev.Pose_config.VISION_RUNNING_MODE.value,
+            min_pose_detection_confidence=ev.Pose_config.MIN_DETETECTION_CONFIDENCE.value,
             min_tracking_confidence=ev.Pose_config.MIN_TRACKING_CONFIDENCE.value,
-            enable_segmentation=ev.Pose_config.SEGMENT_MASK.value,
+            output_segmentation_masks=ev.Pose_config.SEGMENT_MASK.value,
         )
 
-        cap = cv2.VideoCapture(video)
-        total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        remainder = total % clip_frame_len
+        landmarker = PoseLandmarker.create_from_options(options)
 
+        cap = cv2.VideoCapture(video_path)
+        total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         rows = []
 
         for start in range(0, total - 1, clip_frame_len):
@@ -42,11 +46,18 @@ class Pose_extractor:
                 ok, frame = cap.read()
                 if not ok:
                     break
+
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                res = mp_pose.process(rgb)
-                if res.pose_landmarks:
+                timestamp = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+
+                mp_img = mp.Image(image_format = mp.ImageFormat.SRGB,
+                                  data =rgb)
+
+                result = landmarker.detect_for_video(image=mp_img, timestamp_ms=timestamp)
+
+                if result.pose_landmarks:
                     pts = np.array(
-                        [(lm.x, lm.y, lm.z) for lm in res.pose_landmarks.landmark],
+                        [(lm.x, lm.y, lm.z) for lm in result.pose_landmarks[0]],
                         dtype=np.float32,
                     )
                 else:
@@ -55,26 +66,23 @@ class Pose_extractor:
 
             if len(seq) == clip_frame_len:
                 seq = np.stack(seq)
-
                 hips = (seq[:, 23] + seq[:, 24]) / 2.0
                 seq -= hips[:, None, :]
 
-                base = os.path.splitext(os.path.basename(video))[0]
+                base = os.path.splitext(os.path.basename(video_path))[0]
                 out_npz = f"{base}_clip__{start}.npz"
-
                 np.savez_compressed(os.path.join(posenpy, out_npz), arr=seq, hips=hips)
 
                 label = base.split("_")[0]
-                rows.append(
-                    {"filepath": os.path.join(posenpy, out_npz), "label": label}
-                )
+                rows.append({"filepath": os.path.join(posenpy, out_npz), "label": label})
 
         cap.release()
-        mp_pose.close()
+        landmarker.close()
         return rows
 
 
 def main():
+    print(ev.Pose_config.VISION_RUNNING_MODE.value)
     clip_counter = 0
     rows = []
     for vid in tqdm(glob.glob(os.path.join(video, "*.mp4")), desc="Gait videos"):

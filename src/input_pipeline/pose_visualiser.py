@@ -93,9 +93,9 @@ def main():
     Finds all processed .npz files, groups them by their base video name,
     and creates a stitched MP4 of the base video
     """
-    npz_files = sorted(glob.glob(os.path.join(Directory.POSEDATANPY.value, "*.npz")))
+    npz_files = sorted(glob.glob(os.path.join(Directory.POSE_DATA_NPY.value, "*.npz")))
     if not npz_files:
-        print(f"No processed .npz files found in '{Directory.POSEDATANPY.value}'")
+        print(f"No processed .npz files found in '{Directory.POSE_DATA_NPY.value}'")
         print("Please run `extract_poses.py` first.")
         return
 
@@ -129,7 +129,7 @@ def main():
         )
 
         output_filename = f"{base_name}_gait_visualization.mp4"
-        output_path = os.path.join(Directory.VIDEOOUTPUT.value, output_filename)
+        output_path = os.path.join(Directory.VIDEO_OUTPUT.value, output_filename)
         source_video_path = os.path.join(Directory.VIDEO.value, f"{base_name}.mp4")
 
         if not os.path.exists(source_video_path):
