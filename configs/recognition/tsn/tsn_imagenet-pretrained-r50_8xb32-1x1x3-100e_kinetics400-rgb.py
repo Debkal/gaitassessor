@@ -5,11 +5,10 @@ _base_ = [
 
 # dataset settings
 dataset_type = 'VideoDataset'
-data_root = 'data/kinetics400/videos_train'
-data_root_val = 'data/kinetics400/videos_val'
-ann_file_train = 'data/kinetics400/kinetics400_train_list_videos.txt'
-ann_file_val = 'data/kinetics400/kinetics400_val_list_videos.txt'
-
+data_root = '../datasets/gavd/GAVD-main/data/cats_1'
+data_root_val = '../datasets/gavd/GAVD-main/data/cats_2'
+ann_file_train =  '../datasets/gavd/GAVD-main/data/output_1/mmaction_GAVD_Clinical_Annotations_1.csv'
+ann_file_val = '../datasets/gavd/GAVD-main/data/output_1/mmaction_GAVD_Clinical_Annotations_2.csv'
 file_client_args = dict(io_backend='disk')
 
 train_pipeline = [
@@ -58,7 +57,7 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(
-    batch_size=32,
+    batch_size=8,
     num_workers=8,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -79,7 +78,7 @@ val_dataloader = dict(
         pipeline=val_pipeline,
         test_mode=True))
 test_dataloader = dict(
-    batch_size=1,
+    batch_size=2,
     num_workers=8,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -93,8 +92,27 @@ test_dataloader = dict(
 val_evaluator = dict(type='AccMetric')
 test_evaluator = val_evaluator
 
-default_hooks = dict(checkpoint=dict(interval=3, max_keep_ckpts=3))
+model = dict(
+    cls_head=dict(
+        num_classes=11
+    )
+)
 
+# Save checkpoints every epoch, and only keep the latest checkpoint
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=1))
+# Set the maximum number of epochs to 10, and validate the model every 1 epochs
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=10, val_interval=1)
+# adjust learning rate schedule according to 10 epochs
+param_scheduler = [
+    dict(
+        type='MultiStepLR',
+        begin=0,
+        end=10,
+        by_epoch=True,
+        milestones=[4, 8],
+        gamma=0.1)
+]
 # Default setting for scaling LR automatically
 #   - `enable` means enable scaling LR automatically
 #       or not by default.

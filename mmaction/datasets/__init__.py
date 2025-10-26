@@ -11,10 +11,11 @@ from .repeat_aug_dataset import RepeatAugDataset, repeat_pseudo_collate
 from .transforms import *  # noqa: F401, F403
 from .video_dataset import VideoDataset
 from .video_text_dataset import VideoTextDataset
+from .multilabel_video_dataset import MultiLabelVideoDataset
 
 __all__ = [
     'AVADataset', 'AVAKineticsDataset', 'ActivityNetDataset', 'AudioDataset',
     'BaseActionDataset', 'PoseDataset', 'RawframeDataset', 'RepeatAugDataset',
     'VideoDataset', 'repeat_pseudo_collate', 'VideoTextDataset',
-    'MSRVTTRetrieval', 'MSRVTTVQA', 'MSRVTTVQAMC', 'CharadesSTADataset'
+    'MSRVTTRetrieval', 'MSRVTTVQA', 'MSRVTTVQAMC', 'CharadesSTADataset','MultiLabelVideoDataset'
 ]

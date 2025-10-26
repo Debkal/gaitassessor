@@ -25,6 +25,10 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+data/
+browse_out/
+#sample model
+tsn_imagenet-pretrained-r50_8xb32-1x1x8-100e_kinetics400-rgb.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -144,6 +148,8 @@ work_dirs/
 mmaction/tools/*
 
 *.ipynb
+*.zip
+*.swp
 
 # unignore ipython notebook files in demo
 !demo/*.ipynb
