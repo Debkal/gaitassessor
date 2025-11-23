@@ -61,7 +61,7 @@ class VideoDataset(BaseActionDataset):
                  start_index: int = 0,
                  modality: str = 'RGB',
                  test_mode: bool = False,
-                 delimiter: str = ' ',
+                 delimiter: str = ',',
                  **kwargs) -> None:
         self.delimiter = delimiter
         super().__init__(

@@ -2,13 +2,23 @@ _base_ = [
     '../../_base_/models/tsn_r50.py', '../../_base_/schedules/sgd_100e.py',
     '../../_base_/default_runtime.py'
 ]
-
-# dataset settings
-dataset_type = 'VideoDataset'
+"""Test Results 1
 data_root = '../datasets/gavd/GAVD-main/data/cats_1'
 data_root_val = '../datasets/gavd/GAVD-main/data/cats_2'
 ann_file_train =  '../datasets/gavd/GAVD-main/data/output_1/mmaction_GAVD_Clinical_Annotations_1.csv'
 ann_file_val = '../datasets/gavd/GAVD-main/data/output_1/mmaction_GAVD_Clinical_Annotations_2.csv'
+Epoch 2: Acc out of 1: 40% rounded, Acc out of 5: 80% rounded, 12% acc out of avg
+Reflection: a start 
+"""
+
+# dataset settings
+dataset_type = 'VideoDataset'
+data_root = '../datasets/gavd/GAVD-main/data/cats_merge/train'
+data_root_val = '../datasets/gavd/GAVD-main/data/cats_merge/val'
+data_root_ext =  '../datasets/gavd/GAVD-main/data/cats_merge/external_test_set'
+ann_file_train =  '../datasets/gavd/GAVD-main/data/cats_merge/train_videos_labeled.csv'
+ann_file_val = '../datasets/gavd/GAVD-main/data/cats_merge/val_videos_labeled.csv'
+ext_file_test = '../datasets/gavd/GAVD-main/data/cats_merge/external_test_set/external_test.csv'
 file_client_args = dict(io_backend='disk')
 
 train_pipeline = [
@@ -77,11 +87,12 @@ val_dataloader = dict(
         data_prefix=dict(video=data_root_val),
         pipeline=val_pipeline,
         test_mode=True))
+#ext_file_test and data_root_ext
 test_dataloader = dict(
-    batch_size=2,
+    batch_size=1,
     num_workers=8,
     persistent_workers=True,
-    sampler=dict(type='DefaultSampler', shuffle=False),
+    sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(
         type=dataset_type,
         ann_file=ann_file_val,
@@ -94,15 +105,15 @@ test_evaluator = val_evaluator
 
 model = dict(
     cls_head=dict(
-        num_classes=11
+        num_classes=2
     )
 )
 
-# Save checkpoints every epoch, and only keep the latest checkpoint
+# Save checkpoints every epoch, and only keep every checkpoint
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=1))
-# Set the maximum number of epochs to 10, and validate the model every 1 epochs
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=10, val_interval=1)
+    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=-1))
+# Set the maximum number of epochs to 50, and validate the model every 1 epochs
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=50,val_begin=1, val_interval=1)
 # adjust learning rate schedule according to 10 epochs
 param_scheduler = [
     dict(
