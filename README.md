@@ -29,5 +29,3 @@ Make sure your Directory tree is setup as shown at minimum.The data directory ca
 ```
 ### Configuring the model
 Go to configs directory and choose the best fit approach for your data. Than make sure to go to the deepest folder until you run across the "model_name.py". Edit the file to configure the data to train and validate on. Than adjust the epoch parameters to your liking. For example for TSN a config to choose is configs/recognition/tsn/tsn_imagenet-pretrained-r50_8xb32-1x1x3-100e_kinetics400-rgb.py .
-#### License
-This project is under the [Apache 2.0 license](https://github.com/open-mmlab/mmaction2/blob/main/LICENSE)
