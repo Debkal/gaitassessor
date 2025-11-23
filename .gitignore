@@ -4,3 +4,4 @@ src/input_pipeline/__pycache__/
 data
 *.task
 *.tflite
+*.yml

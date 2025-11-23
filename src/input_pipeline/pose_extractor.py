@@ -82,7 +82,7 @@ class Pose_extractor:
 
 
 def main():
-    print(ev.Pose_config.VISION_RUNNING_MODE.value)
+
     clip_counter = 0
     rows = []
     for vid in tqdm(glob.glob(os.path.join(video, "*.mp4")), desc="Gait videos"):

@@ -11,7 +11,6 @@ class Directory(Enum):
     POSE_FULL_MODEL= "../model/pose_task/pose_landmarker_full.task"
     POSE_HEAVY_MODEL= "../model/pose_task/pose_landmarker_heavy.task"
 
-
 class Pose_config(Enum):
     STATIC_IMAGE_MODE = False
     MODEL_COMPLEXITY = 1

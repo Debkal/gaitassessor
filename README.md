@@ -1,6 +1,6 @@
 ## Gait Assesor
 
-This is a machine learning model that makes an assessment of a person's gait with an input of a video   file(.mp4)<br>
+This is a machine learning application that extracts the pose of a person's gait with an input of a video file(.mp4)<br>
 
 ### Dependencies
 
@@ -42,10 +42,11 @@ Make sure your file tree structure is arranged in the following format
     │   ├── pose_extractor.py
     │   └── visualise_gait.py
     └── model
+        ├── pose_task
+        │    └── pose_landmarker_heavy.task
+        └── gait_assessment
 ```
-
-
-This machine learning model is a hybrid model using a Convolutional Neural Network and Recurrent Neural Network
-in tandom to execute an assessment of the gait state of any person. It will return a boolean for its overall assessment. True for a gait within normal deviation and False for a gait with irregular deviation. For both cases it will digress into key frames that lead to its assessment. It will respond with a description of the key frame and what could possibly indicate a break down in gait at these key frames.
+This application is a representation of desired feature extraction using Mediapipe. Mediapipe uses a bottom up pose estimation algorithm. See the model card for more information [BlazePose GHUM](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20BlazePose%20GHUM%203D.pdf).
+It is a visual and interactive representation of what I will be going for in the future. As I work on gait feature extraction at the lowest level.
 
 ##### This is a work in progress and licensed under Apache 2.0
